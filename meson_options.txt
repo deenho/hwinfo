@@ -1,7 +1,5 @@
 option('HWINFO_SHARED', type : 'boolean', value : true, description : 'Shared build')
 option('HWINFO_STATIC', type : 'boolean', value : false, description : 'Static build')
-option('BUILD_EXAMPLES', type : 'string', value : PROJECT_IS_TOP_LEVEL, description : 'Build example program')
-option('BUILD_TESTING', type : 'string', value : PROJECT_IS_TOP_LEVEL, description : 'Build test program')
 option('HWINFO_OS', type : 'boolean', value : true, description : 'Enable OS information')
 option('HWINFO_MAINBOARD', type : 'boolean', value : true, description : 'Enable mainboard information')
 option('HWINFO_CPU', type : 'boolean', value : true, description : 'Enable CPU information')
