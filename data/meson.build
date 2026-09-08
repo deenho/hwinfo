@@ -8,7 +8,6 @@ pci_ids_header = custom_target(
   command: [py, files('embed.py'), '@INPUT@', '@OUTPUT@', 'pci_ids'],
   depend_files: files('embed.py'),
   build_by_default: true,
-  description: 'Generating pci_ids header',
 )
 
 # The generated header is consumed by src/PCIMapper.cpp.
