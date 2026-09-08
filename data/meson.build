@@ -1,3 +1,18 @@
-pci_ids_header_output = '${HWINFO_CMAKE_BINARY_DIR}/generated/pci.ids.h'
-# add_custom_command(['OUTPUT', pci_ids_header_output, 'COMMAND', cmake_command, '-E', 'make_directory', '${HWINFO_CMAKE_BINARY_DIR}/generated', 'COMMAND', cmake_command, '-DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/pci.ids', '-DOUTPUT=${PCI_IDS_HEADER_OUTPUT}', '-DNAME=pci_ids', '-P', cmake_current_source_dir, '/embed.cmake', 'DEPENDS', '${CMAKE_CURRENT_SOURCE_DIR}/pci.ids', '${CMAKE_CURRENT_SOURCE_DIR}/embed.cmake', 'COMMENT', 'Generating pci_ids header', 'VERBATIM'])
-# add_custom_target(['generate_pci_ids_header', 'DEPENDS', '${PCI_IDS_HEADER_OUTPUT}'])
+# Generate the same C/C++ byte-array header that data/embed.cmake produced.
+py = import('python').find_installation('python3', required: true)
+
+pci_ids_header = custom_target(
+  'pci_ids_header',
+  input: 'pci.ids',
+  output: 'pci.ids.h',
+  command: [py, files('embed.py'), '@INPUT@', '@OUTPUT@', 'pci_ids'],
+  depend_files: files('embed.py'),
+  build_by_default: true,
+  description: 'Generating pci_ids header',
+)
+
+# The generated header is consumed by src/PCIMapper.cpp.
+generated_pci_dep = declare_dependency(
+  include_directories: include_directories('.'),
+  sources: pci_ids_header,
+)

@@ -1,6 +1,15 @@
-  system_info_exe = executable('system_info', 'system_infoMain.cpp')
-  # target_link_libraries(['system_info', 'PRIVATE', 'lfreist-hwinfo::hwinfo'])
-  # install(['TARGETS', 'system_info'])
-  live_monitor_exe = executable('live_monitor', 'live_monitorMain.cpp')
-  # target_link_libraries(['live_monitor', 'PRIVATE', 'lfreist-hwinfo::hwinfo'])
-  # install(['TARGETS', 'live_monitor'])
+if get_option('build_examples')
+  system_info = executable(
+    'system_info',
+    'system_infoMain.cpp',
+    dependencies: [hwinfo_dep],
+    install: true,
+  )
+
+  live_monitor = executable(
+    'live_monitor',
+    'live_monitorMain.cpp',
+    dependencies: [hwinfo_dep],
+    install: true,
+  )
+endif

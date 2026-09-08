@@ -1,14 +1,21 @@
-    # message('Using OpenCL for GPU information...')
-    OpenCLHeaders_dep = dependency('OpenCLHeaders')
-    if 'OpenCLHeaders_FOUND'
-      OpenCLHeadersCpp_dep = dependency('OpenCLHeadersCpp')
-      OpenCLICDLoader_dep = dependency('OpenCLICDLoader')
-    else
-      opencl_sdk_build_samples = ['OFF', 'CACHE', 'BOOL', '', 'FORCE']
-      # fetchcontent_declare(['opencl', 'GIT_REPOSITORY', 'https://github.com/KhronosGroup/OpenCL-SDK.git', 'GIT_TAG', 'v2023.04.17'])
-      # fetchcontent_makeavailable('opencl')
-    endif
-    opencl_device_lib = static_library('opencl_device', 'device.cpp')
-    # hwinfo_configure_api('opencl_device')
-    # target_include_directories(['opencl_device', 'PUBLIC', project_source_dir, '/include'])
-    # target_link_libraries(['opencl_device', 'PUBLIC', 'OpenCL::HeadersCpp', 'OpenCL::OpenCL'])
+message('Using OpenCL for GPU information...')
+
+opencl_dep = dependency('OpenCL', required: true)
+
+opencl_sources = files('device.cpp')
+opencl_args = []
+if host_machine.system() == 'windows'
+  opencl_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+endif
+
+opencl_device = static_library('opencl_device', opencl_sources,
+  cpp_args: opencl_args,
+  include_directories: include_directories('../../include'),
+  dependencies: [opencl_dep],
+  install: false,
+)
+
+opencl_device_dep = declare_dependency(
+  link_with: opencl_device,
+  dependencies: [opencl_dep],
+)

@@ -29,9 +29,6 @@ CPU, RAM, GPU, Disks, Mainboard, ...
   - [Supported Components](#supported-components)
   - [Build `hwinfo`](#build-hwinfo)
   - [Example](#example)
-  - [include hwinfo to cmake project](#include-hwinfo-to-cmake-project)
-    - [Include installed version](#include-installed-version)
-    - [As git submodule](#as-git-submodule)
 
 ## Supported Components
 
@@ -115,19 +112,32 @@ The CMake options control which components will be built and available in the li
 
 ## Build `hwinfo`
 
-> Requirements: git, cmake, c++ compiler (gcc, clang, MSVC)
+> Requirements: git, meson, ninja, and a C++17 compiler (gcc, clang, or MSVC)
 
-1. Download repository:
-    ```
-    git clone https://github.com/lfreist/hwinfo
-    ```
-2. Build using cmake:
-    ```bash
-    mkdir build
-    cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CONFIGURATION_TYPES=Release
-    cmake --build build --config Release
-    ```
-   This builds static and dynamic libraries. Static library cmake targets are named `<target>_static` (e.g. `hwinfo_static`)
+1. Download the repository:
+   ```bash
+   git clone https://github.com/lfreist/hwinfo
+   cd hwinfo
+   ```
+
+2. Configure and build using Meson:
+   ```bash
+   meson setup build --buildtype=release
+   meson compile -C build
+   ```
+
+3. Run the test suite:
+   ```bash
+   meson test -C build --verbose
+   ```
+
+The main build options are exposed as Meson boolean options, for example:
+```bash
+meson setup build -Dhwinfo_cpu=true -Dhwinfo_gpu=false
+```
+
+Use `-Dhwinfo_shared=true` for shared libraries (the default) or
+`-Dhwinfo_static=true` for static libraries. If both are enabled, the static configuration takes precedence.
 
 ## Example
 
@@ -209,68 +219,3 @@ Disk 4:
 ---------------------------------------------------------------------------
 
 ```
-
-## include hwinfo to cmake project
-
-### Include installed version
-
-1. Install hwinfo
-   ```
-   git clone https://github.com/lfreist/hwinfo && cd hwinfo
-   mkdir build
-   cmake -B build && cmake --build build
-   cmake --install build
-   ```
-2. Simply add the following to your `CMakeLists.txt` file:
-    ```cmake
-    # file: CMakeLists.txt
-    
-    find_package(hwinfo REQUIRED)
-    ```
-3. Include `hwinfo` into your `.cpp/.h` files:
-    ```c++
-    // file: your_executable.cpp
-
-    #include <hwinfo/hwinfo.h>
-
-   int main(int argc, char** argv) {
-     // Your code
-   }
-    ```
-4. Link it in cmake
-    ```cmake
-    add_executable(your_executable your_executable.cpp)
-    target_link_libraries(your_executable PUBLIC lfreist-hwinfo::hwinfo)
-    ```
-
-### As git submodule
-
-1. Download `hwinfo` into your project (e.g. in `<project-root>/third_party/hwinfo`)
-    ```
-    mkdir third_party
-    cd third_party
-    git clone https://github.com/lfreist/hwinfo
-    ```
-2. Simply add the following to your `<project-root>/CMakeLists.txt` file:
-    ```cmake
-    # file: <project-root>/CMakeLists.txt
-
-    # define the HWINFO_* options if you want to change the default values
-
-    add_subdirectory(third_party/hwinfo)
-    ```
-3. Include `hwinfo` into your `.cpp/.h` files:
-    ```c++
-    // file: your_executable.cpp
-
-    #include "hwinfo/hwinfo.h"
-
-   int main(int argc, char** argv) {
-     // Your code
-   }
-    ```
-4. Link it in cmake
-    ```cmake
-    add_executable(your_executable your_executable.cpp)
-    target_link_libraries(your_executable PUBLIC lfreist-hwinfo::hwinfo)
-    ```

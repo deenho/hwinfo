@@ -1,52 +1,22 @@
 #!/bin/bash -ex
-# bash or pwsh
+# Build and test the default configuration.
+meson setup build --buildtype=release
+meson compile -C build
+meson test -C build --verbose
 
-# Test default (all)
-cmake -B ./build -DCMAKE_BUILD_TYPE=Release
-cmake --build ./build --parallel --config Release
-cd build
-ctest -C Release -V
-cd ..
+# Verify each individual component can be built in isolation.
+for component in os mainboard cpu disk ram gpu battery; do
+  rm -rf build
+  case "$component" in
+    os)        meson setup build -Dhwinfo_os=true -Dhwinfo_mainboard=false -Dhwinfo_cpu=false -Dhwinfo_disk=false -Dhwinfo_ram=false -Dhwinfo_gpu=false -Dhwinfo_gpu_opencl=false -Dhwinfo_battery=false -Dhwinfo_network=false ;;
+    mainboard) meson setup build -Dhwinfo_os=false -Dhwinfo_mainboard=true -Dhwinfo_cpu=false -Dhwinfo_disk=false -Dhwinfo_ram=false -Dhwinfo_gpu=false -Dhwinfo_gpu_opencl=false -Dhwinfo_battery=false -Dhwinfo_network=false ;;
+    cpu)       meson setup build -Dhwinfo_os=false -Dhwinfo_mainboard=false -Dhwinfo_cpu=true -Dhwinfo_disk=false -Dhwinfo_ram=false -Dhwinfo_gpu=false -Dhwinfo_gpu_opencl=false -Dhwinfo_battery=false -Dhwinfo_network=false ;;
+    disk)      meson setup build -Dhwinfo_os=false -Dhwinfo_mainboard=false -Dhwinfo_cpu=false -Dhwinfo_disk=true -Dhwinfo_ram=false -Dhwinfo_gpu=false -Dhwinfo_gpu_opencl=false -Dhwinfo_battery=false -Dhwinfo_network=false ;;
+    ram)       meson setup build -Dhwinfo_os=false -Dhwinfo_mainboard=false -Dhwinfo_cpu=false -Dhwinfo_disk=false -Dhwinfo_ram=true -Dhwinfo_gpu=false -Dhwinfo_gpu_opencl=false -Dhwinfo_battery=false -Dhwinfo_network=false ;;
+    gpu)       meson setup build -Dhwinfo_os=false -Dhwinfo_mainboard=false -Dhwinfo_cpu=false -Dhwinfo_disk=false -Dhwinfo_ram=false -Dhwinfo_gpu=true -Dhwinfo_gpu_opencl=false -Dhwinfo_battery=false -Dhwinfo_network=false ;;
+    battery)   meson setup build -Dhwinfo_os=false -Dhwinfo_mainboard=false -Dhwinfo_cpu=false -Dhwinfo_disk=false -Dhwinfo_ram=false -Dhwinfo_gpu=false -Dhwinfo_gpu_opencl=false -Dhwinfo_battery=true -Dhwinfo_network=false ;;
+  esac
+  meson compile -C build
+done
 
-# Test OS target
-rm build/CMakeCache.txt
-cmake -B ./build -DCMAKE_BUILD_TYPE=Debug -DHWINFO_OS=ON -DHWINFO_MAINBOARD=OFF -DHWINFO_CPU=OFF -DHWINFO_DISK=OFF -DHWINFO_RAM=OFF -DHWINFO_GPU=OFF -DHWINFO_GPU_OPENCL=OFF -DHWINFO_BATTERY=OFF
-cmake --build ./build --parallel --config Debug -t hwinfo_os
-
-# Test mainboard target
-rm build/CMakeCache.txt
-cmake -B ./build -DCMAKE_BUILD_TYPE=Debug -DHWINFO_OS=OFF -DHWINFO_MAINBOARD=ON -DHWINFO_CPU=OFF -DHWINFO_DISK=OFF -DHWINFO_RAM=OFF -DHWINFO_GPU=OFF -DHWINFO_GPU_OPENCL=OFF -DHWINFO_BATTERY=OFF
-cmake --build ./build --parallel --config Debug -t hwinfo_mainboard
-
-# Test CPU target
-rm build/CMakeCache.txt
-cmake -B ./build -DCMAKE_BUILD_TYPE=Debug -DHWINFO_OS=OFF -DHWINFO_MAINBOARD=OFF -DHWINFO_CPU=ON -DHWINFO_DISK=OFF -DHWINFO_RAM=OFF -DHWINFO_GPU=OFF -DHWINFO_GPU_OPENCL=OFF -DHWINFO_BATTERY=OFF
-cmake --build ./build --parallel --config Debug -t hwinfo_cpu
-
-# Test disk target
-rm build/CMakeCache.txt
-cmake -B ./build -DCMAKE_BUILD_TYPE=Debug -DHWINFO_OS=OFF -DHWINFO_MAINBOARD=OFF -DHWINFO_CPU=OFF -DHWINFO_DISK=ON -DHWINFO_RAM=OFF -DHWINFO_GPU=OFF -DHWINFO_GPU_OPENCL=OFF -DHWINFO_BATTERY=OFF
-cmake --build ./build --parallel --config Debug -t hwinfo_disk
-
-# Test RAM target
-rm build/CMakeCache.txt
-cmake -B ./build -DCMAKE_BUILD_TYPE=Debug -DHWINFO_OS=OFF -DHWINFO_MAINBOARD=OFF -DHWINFO_CPU=OFF -DHWINFO_DISK=OFF -DHWINFO_RAM=ON -DHWINFO_GPU=OFF -DHWINFO_GPU_OPENCL=OFF -DHWINFO_BATTERY=OFF
-cmake --build ./build --parallel --config Debug -t hwinfo_ram
-
-# Test GPU target
-rm build/CMakeCache.txt
-cmake -B ./build -DCMAKE_BUILD_TYPE=Debug -DHWINFO_OS=OFF -DHWINFO_MAINBOARD=OFF -DHWINFO_CPU=OFF -DHWINFO_DISK=OFF -DHWINFO_RAM=OFF -DHWINFO_GPU=ON -DHWINFO_GPU_OPENCL=OFF -DHWINFO_BATTERY=OFF
-cmake --build ./build --parallel --config Debug -t hwinfo_gpu
-
-# # Test GPU target with OpenCL
-# rm build/CMakeCache.txt
-# cmake -B ./build -DCMAKE_BUILD_TYPE=Debug -DHWINFO_OS=OFF -DHWINFO_MAINBOARD=OFF -DHWINFO_CPU=OFF -DHWINFO_DISK=OFF -DHWINFO_RAM=OFF -DHWINFO_GPU=ON -DHWINFO_GPU_OPENCL=ON -DHWINFO_BATTERY=OFF
-# cmake --build ./build --parallel --config Debug -t hwinfo_gpu
-
-# Test battery target
-rm build/CMakeCache.txt
-cmake -B ./build -DCMAKE_BUILD_TYPE=Debug -DHWINFO_OS=OFF -DHWINFO_MAINBOARD=OFF -DHWINFO_CPU=OFF -DHWINFO_DISK=OFF -DHWINFO_RAM=OFF -DHWINFO_GPU=OFF -DHWINFO_GPU_OPENCL=OFF -DHWINFO_BATTERY=ON
-cmake --build ./build --parallel --config Debug -t hwinfo_battery
-
-# Clean up
-rm build/CMakeCache.txt
+rm -rf build
