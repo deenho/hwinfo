@@ -39,7 +39,11 @@ if get_option('hwinfo_battery')
 
   battery_args = []
   if host_machine.system() == 'windows'
-    battery_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+    if build_shared
+      battery_args += ['-DHWINFO_EXPORTS']  
+    else 
+      battery_args += ['-DHWINFO_STATIC']
+    endif
   endif
 
   if build_shared
@@ -78,7 +82,11 @@ if get_option('hwinfo_cpu')
 
   cpu_args = []
   if host_machine.system() == 'windows'
-    cpu_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+    if build_shared
+      cpu_args += ['-DHWINFO_EXPORTS']
+    else
+      cpu_args += ['-DHWINFO_STATIC']
+    endif
   endif
 
   cpu_deps = []
@@ -123,7 +131,11 @@ if get_option('hwinfo_disk')
 
   disk_args = []
   if host_machine.system() == 'windows'
-    disk_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+    if build_shared
+      disk_args += ['-DHWINFO_EXPORTS']
+    else
+      disk_args += ['-DHWINFO_STATIC']
+    endif
   endif
 
   if build_shared
@@ -159,10 +171,15 @@ if get_option('hwinfo_gpu')
     'PCIMapper.cpp',
   )
 
+
   gpu_args = []
   gpu_deps = [generated_pci_dep]
   if host_machine.system() == 'windows'
-    gpu_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+    if build_shared
+      gpu_args += ['-DHWINFO_EXPORTS']
+    else
+      gpu_args += ['-DHWINFO_STATIC']
+    endif
     gpu_deps += win_dxgi + win_setupapi
   endif
 
@@ -217,7 +234,11 @@ if get_option('hwinfo_mainboard')
   mainboard_args = []
   mainboard_deps = []
   if host_machine.system() == 'windows'
-    mainboard_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+    if build_shared
+      mainboard_args += ['-DHWINFO_EXPORTS'] 
+    else 
+      mainboard_args += ['-DHWINFO_STATIC']
+    endif
     if host_machine.cpu_family() == 'x86'
       mainboard_deps += [cpp.find_library('wbemuuid', required: true)]
     endif
@@ -256,7 +277,11 @@ if get_option('hwinfo_os')
 
   os_args = []
   if host_machine.system() == 'windows'
-    os_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+    if build_shared
+      os_args += ['-DHWINFO_EXPORTS'] 
+    else 
+      os_args += ['-DHWINFO_STATIC']
+    endif
   endif
 
   if build_shared
@@ -293,7 +318,11 @@ if get_option('hwinfo_ram')
 
   ram_args = []
   if host_machine.system() == 'windows'
-    ram_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+    if build_shared
+      ram_args += ['-DHWINFO_EXPORTS'] 
+    else 
+      ram_args += ['-DHWINFO_STATIC']
+    endif
   endif
 
   if build_shared
@@ -328,7 +357,11 @@ if get_option('hwinfo_network')
 
   network_args = []
   if host_machine.system() == 'windows'
-    network_args += ['-DHWINFO_EXPORTS'] if build_shared else ['-DHWINFO_STATIC']
+    if build_shared
+      network_args += ['-DHWINFO_EXPORTS']
+    else 
+      network_args += ['-DHWINFO_STATIC']
+    endif
   endif
 
   if build_shared
