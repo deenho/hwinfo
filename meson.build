@@ -40,6 +40,8 @@ subdir('src')
 # There is no physical "hwinfo" library: the original target is INTERFACE-only.
 hwinfo_dep = declare_dependency(
   include_directories: project_inc,
+  # Code using the static libraries must not see HWINFO_API as dllimport.
+  compile_args: build_shared ? [] : ['-DHWINFO_STATIC'],
   dependencies: component_deps,
 )
 
